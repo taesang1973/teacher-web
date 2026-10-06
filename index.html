@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<title>1920~40년대 국외 무장 독립 운동 | 한국사 학습</title>
+<style>
+  :root {
+    --primary: #1e5aa8;
+    --primary-dark: #123c73;
+    --accent: #5aa9e6;
+    --bg: #f2f8fd;
+    --card: #ffffff;
+    --text: #1f2a38;
+    --muted: #5a6b7d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  header {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    color: #fff; text-align: center; padding: 48px 20px 40px;
+  }
+  header h1 { font-size: 2rem; margin-bottom: 8px; }
+  header p { color: #bcd9f5; font-size: 1.05rem; }
+  nav {
+    background: #fff; position: sticky; top: 0; z-index: 10;
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+  nav button {
+    border: none; background: #dcebf7; color: var(--primary-dark);
+    padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: .95rem; font-weight: bold;
+  }
+  nav button.active, nav button:hover { background: var(--primary); color: #fff; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 18px 80px; }
+  section { display: none; animation: fade .4s ease; }
+  section.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+  h2 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 6px; margin-bottom: 18px; }
+  h3 { color: var(--primary-dark); margin: 20px 0 8px; }
+  .card { background: var(--card); border-radius: 12px; padding: 20px 22px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+  .badge { display: inline-block; background: var(--primary); color: #fff; border-radius: 6px; padding: 2px 10px; font-size: .85rem; margin-bottom: 8px; }
+  .badge.gold { background: var(--accent); color: #3a2a00; }
+  ul { margin-left: 22px; }
+  li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #e5d9c3; padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: #dcebf7; color: var(--primary-dark); }
+  .goal-box { background: #dcebf7; border-left: 6px solid var(--accent); padding: 16px 20px; border-radius: 8px; font-size: 1.1rem; }
+  .timeline { border-left: 4px solid var(--primary); margin-left: 10px; padding-left: 20px; }
+  .timeline div { margin-bottom: 14px; position: relative; }
+  .timeline div::before { content: ''; position: absolute; left: -27px; top: 6px; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
+  .timeline .year { font-weight: bold; color: var(--primary); }
+  .quiz-q { margin-bottom: 18px; }
+  .quiz-q p { font-weight: bold; margin-bottom: 6px; }
+  .quiz-q label { display: block; background: #fff; border: 1px solid #e5d9c3; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; cursor: pointer; }
+  .quiz-q input { margin-right: 8px; }
+  #quizResult { font-weight: bold; font-size: 1.1rem; color: var(--primary-dark); margin-top: 12px; }
+  button.submit { background: var(--primary); color: #fff; border: none; padding: 10px 26px; border-radius: 20px; font-size: 1rem; cursor: pointer; }
+  .correct { background: #d8f0d2 !important; border-color: #5aa64b !important; }
+  .wrong { background: #f8d7da !important; border-color: #c0392b !important; }
+  footer { text-align: center; color: var(--muted); padding: 24px; font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🇰🇷 국외 무장 독립 운동 (1920~1940년대)</h1>
+  <p>고등학교 한국사 · 일제 강점기의 독립 전쟁</p>
+</header>
+
+<nav>
+  <button class="active" onclick="show('goal', this)">학습 목표</button>
+  <button onclick="show('1920', this)">1920년대</button>
+  <button onclick="show('1930', this)">1930년대</button>
+  <button onclick="show('1940', this)">1940년대</button>
+  <button onclick="show('timeline', this)">연표</button>
+  <button onclick="show('map', this)">지도</button>
+  <button onclick="show('quiz', this)">확인 퀴즈</button>
+</nav>
+
+<main>
+
+  <!-- 학습 목표 -->
+  <section id="goal" class="active">
+    <h2>🎯 학습 목표</h2>
+    <div class="goal-box">
+      1920년대부터 1940년대까지 독립을 위한 <strong>국외 무장 독립 투쟁</strong>에 대해 설명할 수 있다.
+    </div>
+    <h3>이 단원에서 배우는 것</h3>
+    <div class="card">
+      <ul>
+        <li>3·1 운동 이후 만주·연해주로 이동한 독립군 부대들의 활동</li>
+        <li>봉오동 전투, 청산리 대첩 등 1920년대 대표 전투</li>
+        <li>1930년대 만주사변 이후 한중 연합 작전</li>
+        <li>한국광복군 창설과 1940년대 중국 관내 투쟁</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 1920년대 -->
+  <section id="1920">
+    <h2>⚔️ 1920년대: 독립군의 봉우리</h2>
+    <div class="card">
+      <span class="badge">배경</span>
+      <p>3·1 운동(1919) 이후 일제의 탄압이 심해지자, 독립군은 만주·연해주로 이동하여 독립 전쟁을 준비했습니다.</p>
+    </div>
+    <div class="card">
+      <span class="badge gold">대표 전투</span>
+      <h3>봉오동 전투 (1920)</h3>
+      <p>대한북로독군부의 <strong>홍범도</strong> 장군이 이끄는 독립군이 일본군을 봉오동으로 유인해 크게 격파했습니다.</p>
+      <h3>청산리 대첩 (1920)</h3>
+      <p><strong>김좌진</strong> 장군의 북로군정서군 등 독립군 연합 부대가 청산리 계곡에서 일본군과 6일간 격전을 벌여 큰 승리를 거둔 일제 강점기 최대의 무장 투쟁 성과입니다.</p>
+    </div>
+    <div class="card">
+      <span class="badge">이후 상황</span>
+      <ul>
+        <li><strong>간도 참변 (1920)</strong>: 일본군이 독립군 근거지를 소탕하기 위해 간도 주민을 학살</li>
+        <li><strong>자유시 참변 (1921)</strong>: 독립군 통합 과정의 내부분열로 독립군 사이에 충돌 발생</li>
+        <li><strong>3부 통합 운동</strong>: 참의부·정의부·신민부로 재편, 다시 통합 시도</li>
+        <li><strong>미쓰야 협정 (1925)</strong>: 일본과 만주 군벌의 협정으로 독립군 활동 위축</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 1930년대 -->
+  <section id="1930">
+    <h2>🛡️ 1930년대: 한중 연합 작전</h2>
+    <div class="card">
+      <span class="badge">배경</span>
+      <p>1931년 <strong>만주사변</strong>으로 일본이 만주를 장악하자, 한국과 중국 독립군이 힘을 합쳐 싸웠습니다.</p>
+    </div>
+    <div class="card">
+      <span class="badge gold">대표 부대와 전투</span>
+      <table>
+        <tr><th>부대</th><th>지휘</th><th>연합군</th><th>주요 전투</th></tr>
+        <tr><td>한국독립군</td><td>지청천</td><td>중국 호로군</td><td>쌍성보 전투(1932), 대전자령 전투(1933)</td></tr>
+        <tr><td>조선혁명군</td><td>양세봉</td><td>중국 의용군</td><td>영릉가 전투(1932), 흥경성 전투(1933)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <span class="badge">주요 사건</span>
+      <ul>
+        <li><strong>동북항일연군 (1936)</strong>: 여러 항일 부대가 통합되어 조직, 유격전 전개</li>
+        <li><strong>보천보 전투 (1937)</strong>: 동북항일연군 소속 김일성 부대가 국내 보천보를 기습 공격</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 1940년대 -->
+  <section id="1940">
+    <h2>🔥 1940년대: 한국광복군</h2>
+    <div class="card">
+      <span class="badge">배경</span>
+      <p>중일 전쟁(1937) 이후 일제가 중국 본토까지 침략하자, 독립운동 세력은 중국 관내로 이동했습니다.</p>
+    </div>
+    <div class="card">
+      <span class="badge gold">핵심</span>
+      <h3>한국광복군 창설 (1940)</h3>
+      <ul>
+        <li>임시정부의 직속 군대로 충칭에서 창설, <strong>지청천</strong> 장군이 총사령관</li>
+        <li>1942년 <strong>조선의용대</strong>가 합류하여 병력 강화</li>
+        <li>중국 국민당군과 연합 작전 수행, 국내 진공 작전 준비</li>
+        <li>1945년 미국 전략사무국(OSS)과 협력하여 <strong>국내 진공 작전</strong>을 계획했으나, 광복(8·15)으로 실현되지 못함</li>
+      </ul>
+    </div>
+    <div class="card">
+      <p>💡 국외 무장 독립 운동은 일본의 강력한 탄압 속에서도 독립 의지를 지켜낸 역사적 자산입니다.</p>
+    </div>
+  </section>
+
+  <!-- 연표 -->
+  <section id="timeline">
+    <h2>📅 연표로 보는 국외 무장 독립 운동</h2>
+    <div class="timeline">
+      <div><span class="year">1920</span> 봉오동 전투 · 청산리 대첩 · 간도 참변</div>
+      <div><span class="year">1921</span> 자유시 참변</div>
+      <div><span class="year">1925</span> 미쓰야 협정</div>
+      <div><span class="year">1931</span> 만주사변</div>
+      <div><span class="year">1932</span> 영릉가·쌍성보 전투</div>
+      <div><span class="year">1933</span> 흥경성·대전자령 전투</div>
+      <div><span class="year">1936</span> 동북항일연군 조직</div>
+      <div><span class="year">1937</span> 보천보 전투 · 중일 전쟁</div>
+      <div><span class="year">1940</span> 한국광복군 창설</div>
+      <div><span class="year">1942</span> 조선의용대 합류</div>
+      <div><span class="year">1945</span> 국내 진공 작전 계획 → 광복</div>
+    </div>
+  </section>
+
+  <!-- 지도 -->
+  <section id="map">
+    <h2>🗺️ 지도로 보는 무장 독립 운동</h2>
+    <div class="card">
+      <div id="mapContainer" style="height: 420px; border-radius: 10px;"></div>
+      <div style="margin-top: 18px; text-align: center;">
+        <div id="yearLabel" style="font-size: 1.6rem; font-weight: bold; color: var(--primary); margin-bottom: 8px;"></div>
+        <input type="range" id="yearSlider" min="0" max="9" value="0" style="width: 90%;">
+        <div id="eventList" style="margin-top: 12px; text-align: left;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 퀴즈 -->
+  <section id="quiz">
+    <h2>📝 확인 퀴즈</h2>
+    <div class="quiz-q">
+      <p>1. 1920년 청산리 대첩을 이끈 지휘관은?</p>
+      <label><input type="radio" name="q1" value="a"> 지청천</label>
+      <label><input type="radio" name="q1" value="b"> 김좌진</label>
+      <label><input type="radio" name="q1" value="c"> 양세봉</label>
+    </div>
+    <div class="quiz-q">
+      <p>2. 1930년대 한중 연합 작전에서 조선혁명군과 연합한 중국군은?</p>
+      <label><input type="radio" name="q2" value="a"> 호로군</label>
+      <label><input type="radio" name="q2" value="b"> 의용군</label>
+      <label><input type="radio" name="q2" value="c"> 팔로군</label>
+    </div>
+    <div class="quiz-q">
+      <p>3. 1940년 충칭에서 창설된 임시정부 직속 군대는?</p>
+      <label><input type="radio" name="q3" value="a"> 의열단</label>
+      <label><input type="radio" name="q3" value="b"> 동북항일연군</label>
+      <label><input type="radio" name="q3" value="c"> 한국광복군</label>
+    </div>
+    <button class="submit" onclick="gradeQuiz()">채점하기</button>
+    <div id="quizResult"></div>
+  </section>
+
+</main>
+
+<footer>© 고등학교 한국사 수업 자료 · 1920~40년대 국외 무장 독립 운동</footer>
+
+<script>
+  function show(id, btn) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'map' && map) setTimeout(() => map.invalidateSize(), 100);
+  }
+
+  // 지도 기능
+  const events = [
+    { year: "1920", items: [
+      { name: "봉오동 전투", desc: "홍범도 부대, 독립군 첫 승리", lat: 44.78, lng: 130.36 },
+      { name: "청산리 대첩", desc: "김좌진 부대, 일제 강점기 최대 승리", lat: 44.95, lng: 129.5 },
+      { name: "간도 참변", desc: "일본군의 간도 주민 학살", lat: 43.5, lng: 129.9 }
+    ]},
+    { year: "1921", items: [
+      { name: "자유시 참변", desc: "독립군 통합 과정의 내분", lat: 49.71, lng: 134.88 }
+    ]},
+    { year: "1925", items: [
+      { name: "미쓰야 협정", desc: "일·만주 군벌 간 협정, 독립군 탄압", lat: 44.0, lng: 128.0 }
+    ]},
+    { year: "1931", items: [
+      { name: "만주사변", desc: "일본의 만주 침략 시작", lat: 41.80, lng: 123.43 }
+    ]},
+    { year: "1932", items: [
+      { name: "영릉가 전투", desc: "조선혁명군·의용군 연합 작전", lat: 43.0, lng: 125.8 },
+      { name: "쌍성보 전투", desc: "한국독립군·호로군 연합 작전", lat: 44.1, lng: 124.7 }
+    ]},
+    { year: "1933", items: [
+      { name: "흥경성 전투", desc: "조선혁명군의 승리", lat: 45.5, lng: 126.6 },
+      { name: "대전자령 전투", desc: "한국독립군의 승리", lat: 45.34, lng: 123.0 }
+    ]},
+    { year: "1936", items: [
+      { name: "동북항일연군 조직", desc: "항일 부대 통합, 유격전 전개", lat: 42.9, lng: 130.4 }
+    ]},
+    { year: "1937", items: [
+      { name: "보천보 전투", desc: "동북항일연군, 국내 기습 공격", lat: 41.95, lng: 128.3 }
+    ]},
+    { year: "1940", items: [
+      { name: "한국광복군 창설", desc: "충칭, 임시정부 직속 군대", lat: 29.56, lng: 106.55 }
+    ]},
+    { year: "1945", items: [
+      { name: "국내 진공 작전 계획", desc: "광복으로 실현되지 못함", lat: 29.4, lng: 106.9 }
+    ]}
+  ];
+
+  let map = null, markers = L.layerGroup();
+  window.addEventListener('load', () => {
+    map = L.map('mapContainer').setView([43.5, 127.5], 5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+    markers.addTo(map);
+    document.getElementById('yearSlider').max = events.length - 1;
+    document.getElementById('yearSlider').addEventListener('input', updateMap);
+    updateMap();
+  });
+
+  function updateMap() {
+    const idx = document.getElementById('yearSlider').value;
+    const data = events[idx];
+    document.getElementById('yearLabel').textContent = data.year + "년";
+    document.getElementById('eventList').innerHTML = data.items.map(it =>
+      `<div style="background:#dcebf7; border-radius:8px; padding:8px 14px; margin-bottom:6px;">
+        <strong style="color:var(--primary-dark)">${it.name}</strong> — ${it.desc}
+      </div>`).join('');
+    markers.clearLayers();
+    data.items.forEach(it => {
+      L.circleMarker([it.lat, it.lng], { radius: 9, color: '#123c73', fillColor: '#2e7fd9', fillOpacity: 0.85 })
+        .bindPopup(`<strong>${it.name}</strong><br>${it.desc}`)
+        .addTo(markers);
+    });
+  }
+
+  function gradeQuiz() {
+    const answers = { q1: 'b', q2: 'b', q3: 'c' };
+    let score = 0;
+    for (const q in answers) {
+      const input = document.querySelector(`input[name="${q}"]:checked`);
+      document.querySelectorAll(`input[name="${q}"]`).forEach(i => i.parentElement.classList.remove('correct','wrong'));
+      if (input) {
+        if (input.value === answers[q]) { score++; input.parentElement.classList.add('correct'); }
+        else input.parentElement.classList.add('wrong');
+      }
+    }
+    document.getElementById('quizResult').textContent = `${score} / 3 정답! ${score === 3 ? '🎉 완벽해요!' : '다시 한번 내용을 확인해 보세요.'}`;
+  }
+</script>
+
+</body>
+</html>
